@@ -20,8 +20,7 @@ public class CarServer {
         int len = 1024;
 
         Inventory inventory = new Inventory();
-        HashMap<String, ArrayList<Integer>> customers = new HashMap<String, ArrayList<Integer>>();
-        HashMap<Integer, Record> activeRecords = new HashMap<Integer, Record>();
+
         // parse the inventory file
         try {
             Scanner sc = new Scanner(new FileReader(fileName));
@@ -39,7 +38,9 @@ public class CarServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO: handle request from clients
+        // Start a new thread that accepts TCP requests from clients
+        Thread tcpListener = new Thread(new TCPListener(inventory, tcpPort));
+        tcpListener.start();
 
         // Make main thread accept UDP requests. TCP will listen inside another thread.
         DatagramPacket datapacket, returnpacket;
@@ -65,10 +66,10 @@ public class CarServer {
                             if(inventory.getCar(wantedCar).getCount() > 0){
                                 // Tell client: 'Your request has been approved, <id> <name> <brand> <color>
                                 int recordID = inventory.issueRecordNumber();
-                                activeRecords.put(recordID, new Record(customerName, wantedCar));
-                                if(!customers.containsKey(customerName))
-                                    customers.put(customerName, new ArrayList<Integer>());
-                                customers.get(customerName).add(recordID);
+                                inventory.putRecord(recordID, new Record(customerName, wantedCar));
+                                if(!inventory.customerExists(customerName))
+                                    inventory.putCustomer(customerName, new ArrayList<Integer>());
+                                inventory.customerAddCar(customerName, recordID);
 
                                 inventory.getCar(wantedCar).decrementCount();
                                 String message = "Your request has been approved, " + recordID
@@ -89,10 +90,10 @@ public class CarServer {
                         break;
                     case "return":
                         int recordID = Integer.parseInt(tokens[1]);
-                        if(activeRecords.containsKey(recordID)){
-                            inventory.getCar(activeRecords.get(recordID).getCar()).incrementCount();
-                            customers.get(activeRecords.get(recordID).getCustomerName()).remove((Integer)recordID);
-                            activeRecords.remove(recordID);
+                        if(inventory.recordExists(recordID)){
+                            inventory.getCar(inventory.recordGetCar(recordID)).incrementCount();
+                            inventory.customerRemoveCar(inventory.recordGetCustomerName(recordID), recordID);
+                            inventory.removeRecord(recordID);
                             // Tell client: <record-id> is returned
                             String message = recordID + " is returned";
                             udpSendMessage(message, datapacket.getAddress(), datapacket.getPort(), datasocket);
@@ -113,10 +114,10 @@ public class CarServer {
                     case "list":
                         String name = tokens[1];
                         String list = "";
-                        ArrayList<Integer> records = customers.get(name);
+                        ArrayList<Integer> records = inventory.getCustomers().get(name);
                         for(int record : records){
                             list += record + " " +
-                                    activeRecords.get(record).getCarInfo() + ",";   // Use comma as delimiter
+                                    inventory.getActiveRecords().get(record).getCarInfo() + ",";   // Use comma as delimiter
                         }
                         list += ".";
                         udpSendMessage(list, datapacket.getAddress(), datapacket.getPort(), datasocket);
@@ -128,6 +129,7 @@ public class CarServer {
                         }
                         inventoryDump += ".";
                         udpSendMessage(inventoryDump, datapacket.getAddress(), datapacket.getPort(), datasocket);
+                        // TODO: print inventory to "inventory.txt"
                         break;
                 }
             }
@@ -165,37 +167,8 @@ class Record {
     }
 }
 
-// Thread safe data structure for inventory
-// Implement safety through monitors
-class Inventory {
-    private ArrayList<Car> inventory;
-    private int recordNumber;
-    public Inventory(){
-        inventory = new ArrayList<Car>();
-        recordNumber = 0;
-    }
-    public void addCar(Car car){
-        inventory.add(car);
-    }
-    public boolean contains(Car car){
-        return inventory.contains(car);
-    }
-    public Car getCar(Car car){
-        return inventory.get(inventory.indexOf(car));
-    }
-    public int size(){
-        return inventory.size();
-    }
-    public String getCarInfo(int index){
-        Car car = inventory.get(index);
-        return car.getBrand() + " " + car.getColor() + " " + car.getCount();
-    }
-    public synchronized int issueRecordNumber(){
-        recordNumber++;
-        return recordNumber;
-    }
-}
-
+// Monitors are per-object, so this allows other threads to
+// access other Car objects in the inventory.
 class Car {
     private String brand;
     private String color;

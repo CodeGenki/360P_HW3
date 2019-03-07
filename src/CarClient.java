@@ -32,6 +32,11 @@ public class CarClient {
             // Data structures for UDP
             DatagramSocket datasocket = new DatagramSocket();
 
+            // Data structures for TCP
+            Socket tcpsocket;    // Placeholder
+            Scanner din;  // Placeholder
+            PrintStream pout;    // Placeholder
+
             while(sc.hasNextLine()) {
                 String cmd = sc.nextLine();
                 String[] tokens = cmd.split(" ");
@@ -58,7 +63,14 @@ public class CarClient {
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         System.out.println(retstring);
                     } else{
-
+                        tcpsocket = new Socket(ia, tcpPort);
+                        din = new Scanner(tcpsocket.getInputStream());
+                        pout = new PrintStream(tcpsocket.getOutputStream());
+                        pout.println(cmd);
+                        pout.flush();
+                        String retstring = din.nextLine();
+                        System.out.println(retstring);
+                        tcpsocket.close();
                     }
                 } else if (tokens[0].equals("return")) {
                     // send appropriate command to the server and display the
@@ -72,7 +84,14 @@ public class CarClient {
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         System.out.println(retstring);
                     } else{
-
+                        tcpsocket = new Socket(ia, tcpPort);
+                        din = new Scanner(tcpsocket.getInputStream());
+                        pout = new PrintStream(tcpsocket.getOutputStream());
+                        pout.println(cmd);
+                        pout.flush();
+                        String retstring = din.nextLine();
+                        System.out.println(retstring);
+                        tcpsocket.close();
                     }
                 } else if (tokens[0].equals("inventory")) {
                     // send appropriate command to the server and display the
@@ -85,14 +104,27 @@ public class CarClient {
                         DatagramPacket rPacket = recvUDP(datasocket);
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         String[] cars = retstring.split(",");
-                        System.out.println("Inventory listing: ");  // TODO: Line is to make debugging simpler
+                        System.out.println("Inventory listing: ");  // TODO: Remove after debugging
                         int index = 0;
                         while(!cars[index].equals(".")) {
                             System.out.println(cars[index]);
                             index++;
                         }
                     } else{
-
+                        tcpsocket = new Socket(ia, tcpPort);
+                        din = new Scanner(tcpsocket.getInputStream());
+                        pout = new PrintStream(tcpsocket.getOutputStream());
+                        pout.println(cmd);
+                        pout.flush();
+                        String retstring = din.nextLine();
+                        String[] cars = retstring.split(",");
+                        System.out.println("Inventory listing: ");  // TODO: Remove after debugging
+                        int index = 0;
+                        while(!cars[index].equals(".")) {
+                            System.out.println(cars[index]);
+                            index++;
+                        }
+                        tcpsocket.close();
                     }
                 } else if (tokens[0].equals("list")) {
                     // send appropriate command to the server and display the
@@ -105,28 +137,46 @@ public class CarClient {
                         DatagramPacket rPacket = recvUDP(datasocket);
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         String[] records = retstring.split(",");
-                        System.out.println(tokens[1] + "'s rental listing: ");  // TODO: Line is to make debugging simpler
+                        System.out.println(tokens[1] + "'s rental listing: ");  // TODO: Remove after debugging
                         int index = 0;
                         while(!records[index].equals(".")) {
                             System.out.println(records[index]);
                             index++;
                         }
                     } else{
-
+                        tcpsocket = new Socket(ia, tcpPort);
+                        din = new Scanner(tcpsocket.getInputStream());
+                        pout = new PrintStream(tcpsocket.getOutputStream());
+                        pout.println(cmd);
+                        pout.flush();
+                        String retstring = din.nextLine();
+                        String[] records = retstring.split(",");
+                        System.out.println(tokens[1] + "'s rental listing: ");  // TODO: Remove after debugging
+                        int index = 0;
+                        while(!records[index].equals(".")) {
+                            System.out.println(records[index]);
+                            index++;
+                        }
+                        tcpsocket.close();
                     }
                 } else if (tokens[0].equals("exit")) {
                     // send appropriate command to the server
-                    int length = cmd.length();
-                    byte[] buffer = new byte[length];
-                    buffer = cmd.getBytes();
-                    sendUDP(datasocket, buffer, ia, udpPort);
-                    DatagramPacket rPacket = recvUDP(datasocket);
-                    String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
-                    String[] records = retstring.split(",");
+                    if(isUDP) {
+                        int length = cmd.length();
+                        byte[] buffer = new byte[length];
+                        buffer = cmd.getBytes();
+                        sendUDP(datasocket, buffer, ia, udpPort);
+                    } else{
+                        tcpsocket = new Socket(ia, tcpPort);
+                        din = new Scanner(tcpsocket.getInputStream());
+                        pout = new PrintStream(tcpsocket.getOutputStream());
+                        pout.println(cmd);
+                        pout.flush();
+                        tcpsocket.close();
+                    }
                 } else {
                     System.out.println("ERROR: No such command");
                 }
-                // TODO: print inventory to "inventory.txt"
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
