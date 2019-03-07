@@ -113,8 +113,13 @@ public class CarServer {
                         break;
                     case "list":
                         String name = tokens[1];
-                        String list = inventory.generateList(name);
-                        udpSendMessage(list, datapacket.getAddress(), datapacket.getPort(), datasocket);
+                        if(inventory.customerExists(name) && (inventory.getCustomers().get(name).size() == 0)) {
+                            String list = inventory.generateList(name);
+                            udpSendMessage(list, datapacket.getAddress(), datapacket.getPort(), datasocket);
+                        } else{
+                            String response = "No record found for " + name + ",."; // Delimiter for client
+                            udpSendMessage(response, datapacket.getAddress(), datapacket.getPort(), datasocket);
+                        }
                         break;
                     case "exit":
                         // print inventory to "inventory.txt"

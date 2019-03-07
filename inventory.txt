@@ -1,4 +1,4 @@
-"Ford" "Blue" 1
+"Ford" "Blue" 0
 "Lexus" "Red" 3
 "Toyota" "Yellow" 10
 "Tesla" "Silver" 0

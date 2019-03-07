@@ -85,9 +85,15 @@ public class ServerThread extends Thread{
                     break;
                 case "list":
                     String name = tokens[1];
-                    String list = inventory.generateList(name);
-                    pout.println(list);
-                    pout.flush();
+                    if(inventory.customerExists(name) && (inventory.getCustomers().get(name).size() == 0)) {
+                        String list = inventory.generateList(name);
+                        pout.println(list);
+                        pout.flush();
+                    } else{
+                        String response = "No record found for " + name + ",."; // Delimiter for client
+                        pout.println(response);
+                        pout.flush();
+                    }
                     break;
                 case "exit":
                     inventory.dump();
