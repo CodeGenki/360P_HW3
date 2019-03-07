@@ -1,8 +1,5 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
@@ -88,13 +85,7 @@ public class ServerThread extends Thread{
                     break;
                 case "list":
                     String name = tokens[1];
-                    String list = "";
-                    ArrayList<Integer> records = inventory.getCustomers().get(name);
-                    for(int record : records){
-                        list += record + " " +
-                                inventory.getActiveRecords().get(record).getCarInfo() + ",";   // Use comma as delimiter
-                    }
-                    list += ".";
+                    String list = inventory.generateList(name);
                     pout.println(list);
                     pout.flush();
                     break;

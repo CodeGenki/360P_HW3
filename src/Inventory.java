@@ -89,6 +89,16 @@ class Inventory {
     public synchronized void removeRecord(int id){
         activeRecords.remove(id);
     }
+    public synchronized String generateList(String name){
+        String list = "";
+        ArrayList<Integer> records = customers.get(name);
+        for(int record : records){
+            list += record + " " +
+                    activeRecords.get(record).getCarInfo() + ",";   // Use comma as delimiter
+        }
+        list += ".";
+        return list;
+    }
     /*
         Issue a unique record number
      */

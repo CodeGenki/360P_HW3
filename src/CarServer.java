@@ -113,13 +113,7 @@ public class CarServer {
                         break;
                     case "list":
                         String name = tokens[1];
-                        String list = "";
-                        ArrayList<Integer> records = inventory.getCustomers().get(name);
-                        for(int record : records){
-                            list += record + " " +
-                                    inventory.getActiveRecords().get(record).getCarInfo() + ",";   // Use comma as delimiter
-                        }
-                        list += ".";
+                        String list = inventory.generateList(name);
                         udpSendMessage(list, datapacket.getAddress(), datapacket.getPort(), datasocket);
                         break;
                     case "exit":
