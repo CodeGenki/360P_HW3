@@ -183,7 +183,7 @@ public class CarClient {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SocketException e) {
-            e.printStackTrace();
+            System.out.println("Could not connect to server. Program will terminate.");
         } catch (IOException e){
             e.printStackTrace();
         }

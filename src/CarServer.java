@@ -19,7 +19,7 @@ public class CarServer {
         udpPort = 8000;
         int len = 1024;
 
-        Inventory inventory = new Inventory();
+        Inventory inventory = new Inventory(fileName);
 
         // parse the inventory file
         try {
@@ -123,13 +123,8 @@ public class CarServer {
                         udpSendMessage(list, datapacket.getAddress(), datapacket.getPort(), datasocket);
                         break;
                     case "exit":
-                        String inventoryDump = "";
-                        for(int i = 0; i < inventory.size(); i++){
-                            inventoryDump += inventory.getCarInfo(i) + ",";  // Use comma as a delimiter
-                        }
-                        inventoryDump += ".";
-                        udpSendMessage(inventoryDump, datapacket.getAddress(), datapacket.getPort(), datasocket);
                         // TODO: print inventory to "inventory.txt"
+                        inventory.dump();
                         break;
                 }
             }
@@ -139,6 +134,7 @@ public class CarServer {
             e.printStackTrace();
         }
     }
+
     private static void udpSendMessage(String message, InetAddress ia, int udpPort,
                                        DatagramSocket datasocket) throws IOException{
         byte[] sBuffer = new byte[message.length()];

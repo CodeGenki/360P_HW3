@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,14 +11,28 @@ class Inventory {
     private HashMap<String, ArrayList<Integer>> customers;
     private HashMap<Integer, Record> activeRecords;
     private int recordNumber;
+    private String fileName;
 
-    public Inventory(){
+    public Inventory(String fileName){
         inventory = new ArrayList<Car>();
         recordNumber = 0;
         customers = new HashMap<String, ArrayList<Integer>>();
         activeRecords = new HashMap<Integer, Record>();
+        this.fileName = fileName;
     }
 
+    /*
+        Dump the inventory into the file
+     */
+    public synchronized void dump() throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        for(int i = 0; i < inventory.size(); i++){
+            writer.write(getCarInfo(i));
+            if(i < inventory.size() - 1)
+                writer.write("\n");
+        }
+        writer.close();
+    }
     /*
         Methods for inventory ArrayList
      */

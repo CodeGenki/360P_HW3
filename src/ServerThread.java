@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -49,6 +51,7 @@ public class ServerThread extends Thread{
                             // Tell client: 'Request Failed - Car not available'
                             String message = "Request Failed - Car not available";
                             pout.println(message);
+                            pout.flush();
                         }
                     } else{
                         // Tell client: 'Request Failed - We do not have this car'
@@ -96,13 +99,7 @@ public class ServerThread extends Thread{
                     pout.flush();
                     break;
                 case "exit":
-                    String inventoryDump = "";
-                    for(int i = 0; i < inventory.size(); i++){
-                        inventoryDump += inventory.getCarInfo(i) + ",";  // Use comma as a delimiter
-                    }
-                    inventoryDump += ".";
-                    pout.println(inventoryDump);
-                    pout.flush();
+                    inventory.dump();
                     break;
             }
             client.close();
