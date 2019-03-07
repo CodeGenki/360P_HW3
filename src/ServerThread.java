@@ -29,7 +29,7 @@ public class ServerThread extends Thread{
                     String carBrand = tokens[2];
                     String color = tokens[3];
 
-                    // TODO: Check the inventory.
+                    // Check the inventory.
                     Car wantedCar = new Car(carBrand, color, 1);
                     if(inventory.contains(wantedCar)){
                         if(inventory.getCar(wantedCar).getCount() > 0){

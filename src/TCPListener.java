@@ -14,19 +14,18 @@ public class TCPListener implements Runnable{
     @Override
     public void run() {
         try {
-            System.out.println("TCP Server is running. Listening for connections...");// TODO: Remove after debugging
+            // Make a listener to listen for new connections on this port
             ServerSocket listener = new ServerSocket(tcpPort);
             Socket s;
 
             while((s = listener.accept()) != null){
                 // Create a new thread to handle client's request
-                System.out.println("Accepted TCP connection.");     // TODO: Remove after debugging
                 Thread t = new ServerThread(inventory, s);
                 t.run();
             }
         } catch (IOException e){
             e.printStackTrace();
         }
-        System.out.println("TCP Server terminated");
+        System.out.println("TCP Server terminated.");
     }
 }

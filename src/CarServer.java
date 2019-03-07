@@ -60,7 +60,7 @@ public class CarServer {
                         String carBrand = tokens[2];
                         String color = tokens[3];
 
-                        // TODO: Check the inventory.
+                        // Check the inventory.
                         Car wantedCar = new Car(carBrand, color, 1);
                         if(inventory.contains(wantedCar)){
                             if(inventory.getCar(wantedCar).getCount() > 0){
@@ -123,7 +123,7 @@ public class CarServer {
                         udpSendMessage(list, datapacket.getAddress(), datapacket.getPort(), datasocket);
                         break;
                     case "exit":
-                        // TODO: print inventory to "inventory.txt"
+                        // print inventory to "inventory.txt"
                         inventory.dump();
                         break;
                 }

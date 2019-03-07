@@ -26,6 +26,8 @@ public class CarClient {
         udpPort = 8000;// hardcoded -- must match the server's udp port
 
         try {
+            PrintWriter writer = new PrintWriter("out_" + clientId + ".txt");
+
             InetAddress ia = InetAddress.getByName(hostAddress);
             Scanner sc = new Scanner(new FileReader(commandFile));
 
@@ -62,6 +64,7 @@ public class CarClient {
                         DatagramPacket rPacket = recvUDP(datasocket);
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         System.out.println(retstring);
+                        writer.println(retstring);
                     } else{
                         tcpsocket = new Socket(ia, tcpPort);
                         din = new Scanner(tcpsocket.getInputStream());
@@ -70,6 +73,7 @@ public class CarClient {
                         pout.flush();
                         String retstring = din.nextLine();
                         System.out.println(retstring);
+                        writer.println(retstring);
                         tcpsocket.close();
                     }
                 } else if (tokens[0].equals("return")) {
@@ -83,6 +87,7 @@ public class CarClient {
                         DatagramPacket rPacket = recvUDP(datasocket);
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         System.out.println(retstring);
+                        writer.println(retstring);
                     } else{
                         tcpsocket = new Socket(ia, tcpPort);
                         din = new Scanner(tcpsocket.getInputStream());
@@ -91,6 +96,7 @@ public class CarClient {
                         pout.flush();
                         String retstring = din.nextLine();
                         System.out.println(retstring);
+                        writer.println(retstring);
                         tcpsocket.close();
                     }
                 } else if (tokens[0].equals("inventory")) {
@@ -104,10 +110,11 @@ public class CarClient {
                         DatagramPacket rPacket = recvUDP(datasocket);
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         String[] cars = retstring.split(",");
-                        System.out.println("Inventory listing: ");  // TODO: Remove after debugging
+                        //System.out.println("Inventory listing: ");  // TODO: Remove after debugging
                         int index = 0;
                         while(!cars[index].equals(".")) {
                             System.out.println(cars[index]);
+                            writer.println(cars[index]);
                             index++;
                         }
                     } else{
@@ -118,10 +125,11 @@ public class CarClient {
                         pout.flush();
                         String retstring = din.nextLine();
                         String[] cars = retstring.split(",");
-                        System.out.println("Inventory listing: ");  // TODO: Remove after debugging
+                        //System.out.println("Inventory listing: ");  // TODO: Remove after debugging
                         int index = 0;
                         while(!cars[index].equals(".")) {
                             System.out.println(cars[index]);
+                            writer.println(cars[index]);
                             index++;
                         }
                         tcpsocket.close();
@@ -137,10 +145,11 @@ public class CarClient {
                         DatagramPacket rPacket = recvUDP(datasocket);
                         String retstring = new String(rPacket.getData(), 0, rPacket.getLength());
                         String[] records = retstring.split(",");
-                        System.out.println(tokens[1] + "'s rental listing: ");  // TODO: Remove after debugging
+                        //System.out.println(tokens[1] + "'s rental listing: ");  // TODO: Remove after debugging
                         int index = 0;
                         while(!records[index].equals(".")) {
                             System.out.println(records[index]);
+                            writer.println(records[index]);
                             index++;
                         }
                     } else{
@@ -151,10 +160,11 @@ public class CarClient {
                         pout.flush();
                         String retstring = din.nextLine();
                         String[] records = retstring.split(",");
-                        System.out.println(tokens[1] + "'s rental listing: ");  // TODO: Remove after debugging
+                        //System.out.println(tokens[1] + "'s rental listing: ");  // TODO: Remove after debugging
                         int index = 0;
                         while(!records[index].equals(".")) {
                             System.out.println(records[index]);
+                            writer.println(records[index]);
                             index++;
                         }
                         tcpsocket.close();
@@ -178,6 +188,7 @@ public class CarClient {
                     System.out.println("ERROR: No such command");
                 }
             }
+            writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
